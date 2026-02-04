@@ -12,6 +12,7 @@ pnpm-debug.log*
 # =========================
 dist/
 build/
+scripts/
 coverage/
 .tmp/
 .cache/
@@ -55,3 +56,10 @@ Thumbs.db
 # Git
 # =========================
 .git/
+
+
+# =========================
+# Local Infrastructure State
+# =========================
+.cognito/
+.localstack/

@@ -1,0 +1,61 @@
+services:
+  # BD SQL SERVER
+  sqlserver:
+    container_name: backoffice-sqlserver
+    image: mcr.microsoft.com/mssql/server:2022-latest 
+    platform: linux/amd64
+    environment:
+      - ACCEPT_EULA=Y 
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_PID=Developer 
+      - MSSQL_COLLATION=Modern_Spanish_CI_AS 
+    ports:
+      - "1433:1433" 
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "bash -c '</dev/tcp/localhost/1433' || exit 1"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - backoffice-net
+
+  # PRISMA STUDIO (GUI BD)
+  prisma-studio:
+    image: node:22-slim # Upgrade a Node 22
+    container_name: backoffice-prisma-studio
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: npx prisma studio
+    ports:
+      - "5555:5555"
+    environment:
+      - DATABASE_URL=sqlserver://sqlserver:1433;database=${MSSQL_DB_NAME};user=sa;password=${MSSQL_SA_PASSWORD};encrypt=false;trustServerCertificate=true
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - backoffice-net
+      
+  # EXTERNAL SERVICES MOCK (APIs de Terceros)
+  wiremock:
+    container_name: backoffice-external-mock
+    image: wiremock/wiremock:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - backoffice-net
+volumes:
+  sqlserver_data:
+
+networks:
+  backoffice-net:
+    name: backoffice-shared-net  # <-- Nombre explícito y forzado
+    driver: bridge

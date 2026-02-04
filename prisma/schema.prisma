@@ -1,0 +1,41 @@
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL") // Volvemos a poner la URL aquí
+  schemas  = ["identity_access", "digital_records", "customer_support"]
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+model User {
+  id        String   @id @default(dbgenerated("newid()")) @map("user_id") @db.UniqueIdentifier
+  email     String   @unique @db.VarChar(150)
+  adfsId    String?  @map("adfs_id") @db.VarChar(100)
+  status    String   @default("ACTIVE") @db.VarChar(20)
+  lastLogin DateTime? @map("last_login") @db.DateTime2
+  // Quitamos el (7) para que la validación P1012 pase
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime2 
+  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime2
+  deletedAt DateTime? @map("deleted_at") @db.DateTime2
+
+  permissions ModulePermission[]
+
+  @@map("users")
+  @@schema("identity_access")
+}
+
+model ModulePermission {
+  permId         String   @id @default(dbgenerated("newid()")) @map("perm_id") @db.UniqueIdentifier
+  userId         String   @map("user_id") @db.UniqueIdentifier
+  moduleCode     String   @map("module_code") @db.VarChar(50)
+  canDownloadPii Boolean  @default(false) @map("can_download_pii") @db.Bit
+  // Quitamos el (7) aquí también
+  createdAt      DateTime @default(now()) @map("created_at") @db.DateTime2
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("module_permissions")
+  @@schema("identity_access")
+}

@@ -1,0 +1,38 @@
+services:
+  # S3 y Secrets Manager
+  localstack:
+    container_name: backoffice-aws-mock
+    image: localstack/localstack:3.0 # Volvemos a la 3.0 ya que solo la usaremos para S3/Secrets
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3,secretsmanager
+      - AWS_DEFAULT_REGION=${AWS_REGION}
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_DB_NAME=${MSSQL_DB_NAME}
+      - MSSQL_USER_NAME=${MSSQL_USER_NAME}
+    volumes:
+      - "./scripts/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh"
+    depends_on:
+      - cognito
+    networks:
+      - backoffice-net
+
+  # COGNITO LOCAL (versión 5.1.0)
+  cognito:
+    container_name: backoffice-cognito-mock
+    image: jagregory/cognito-local:5.1.0
+    ports:
+      - "9229:9229"
+    environment:
+      - PORT=9229
+      - REGION=${AWS_REGION}
+    volumes:
+      - ./.cognito:/app/.cognito
+    networks:
+      - backoffice-net
+
+networks:
+  backoffice-net:
+    external: true
+    name: backoffice-shared-net # <-- Debe coincidir con el primer docker

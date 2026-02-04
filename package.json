@@ -6,7 +6,11 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "infra:up": "docker-compose up -d && docker-compose -f docker-compose.aws.yml up -d",
+    "infra:down": "docker-compose down && docker-compose -f docker-compose.aws.yml down",
+    "db:sync": "npx prisma db push",
+    "studio": "npx prisma studio"
   },
   "keywords": [],
   "author": "",
@@ -16,9 +20,11 @@
     "@fastify/autoload": "^6.3.1",
     "@fastify/swagger": "^9.6.1",
     "@fastify/swagger-ui": "^5.2.5",
-    "@prisma/client": "^7.3.0",
+    "@prisma/adapter-mssql": "^7.3.0",
+    "@prisma/client": "^6.19.2",
     "ajv": "^8.17.1",
     "amqplib": "^0.10.9",
+    "dotenv": "^17.2.3",
     "fastify": "^5.7.4",
     "pino": "^10.3.0",
     "undici": "^6.23.0"
@@ -28,8 +34,9 @@
     "eslint": "^9.39.2",
     "jest": "^29.7.0",
     "prettier": "^3.8.1",
-    "prisma": "^7.3.0",
+    "prisma": "^6.19.2",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.2"
   }
 }
