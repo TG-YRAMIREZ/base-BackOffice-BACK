@@ -1,15 +1,20 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaMssql } from '@prisma/adapter-mssql';
 
-// Cargamos la URL directamente del proceso (Node 22)
-const connectionString = process.env.DATABASE_URL?.replace(/["']/g, '')!;
+// Limpieza de caracteres invisibles o comillas de Windows
+const connectionString = (process.env.DATABASE_URL || '').replace(/["']/g, '').trim();
+
+if (!connectionString) {
+  throw new Error("❌ DATABASE_URL no definida");
+}
+
 const adapter = new PrismaMssql(connectionString);
 
-// Instancia única para evitar fugas de memoria en SQL Server
 export const prisma = new PrismaClient({ 
   adapter,
-  log: ['query', 'error', 'warn'] 
+  log: ['error', 'warn'] 
 });
+
 
 /**
  * Función de prueba para validar que los datos del SEED existen
@@ -29,3 +34,5 @@ export async function validateSeedData() {
     console.error('❌ Error al validar datos:', error);
   }
 }
+
+

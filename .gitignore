@@ -28,9 +28,9 @@ coverage/
 .env
 .env.*
 !.env.example
+.history/
 
 # =========================
-# Prisma
 # =========================
 prisma/dev.db
 prisma/*.db
@@ -51,6 +51,8 @@ Thumbs.db
 # VSCode
 .vscode/
 !.vscode/extensions.json
+.history/
+.idea/
 
 # =========================
 # Git
