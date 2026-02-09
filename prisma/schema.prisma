@@ -1,41 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "sqlserver"
   url      = env("DATABASE_URL")
-  schemas  = ["identity_access", "digital_records", "customer_support"]
-}
-
-generator client {
-  provider        = "prisma-client-js"
+  schemas  = ["customer_support", "digital_records", "identity_access"]
 }
 
 model User {
-  userId        String   @id @default(dbgenerated("newid()")) @map("user_id") @db.UniqueIdentifier
-  email     String   @unique @db.VarChar(150)
-  adfsId    String?  @map("adfs_id") @db.VarChar(100)
-  status    String   @default("ACTIVE") @db.VarChar(20)
-  lastLogin DateTime? @map("last_login") @db.DateTime2
-  createdAt DateTime @default(now()) @map("created_at") @db.DateTime2 
-  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime2
-  deletedAt DateTime? @map("deleted_at") @db.DateTime2
-
-  permissions ModulePermission[]
+  userId              String                @id(map: "pk_users") @default(dbgenerated("newid()"), map: "DF__users__user_id__4AB81AF0") @map("user_id") @db.UniqueIdentifier
+  email               String                @unique(map: "uq_users_email") @db.VarChar(150)
+  adfsId              String?               @map("adfs_id") @db.VarChar(100)
+  status              String                @default("ACTIVE", map: "DF__users__status__4BAC3F29") @db.VarChar(20)
+  lastLogin           DateTime?             @map("last_login")
+  createdAt           DateTime              @default(dbgenerated("sysdatetime()"), map: "DF__users__created_a__4CA06362") @map("created_at")
+  updatedAt           DateTime              @default(dbgenerated("sysdatetime()"), map: "DF__users__updated_a__4D94879B") @updatedAt @map("updated_at")
+  deletedAt           DateTime?             @map("deleted_at")
+  audit_download_logs audit_download_logs[]
+  permissions         ModulePermission[]
+  record_requests     record_requests[]
+  territory_logs      territory_logs[]
 
   @@map("users")
   @@schema("identity_access")
 }
 
 model ModulePermission {
-  permId         String   @id @default(dbgenerated("newid()")) @map("perm_id") @db.UniqueIdentifier
-  userId         String   @map("user_id") @db.UniqueIdentifier
-  moduleCode     String   @map("module_code") @db.VarChar(50)
-  canDownloadPii Boolean  @default(false) @map("can_download_pii") @db.Bit
-  createdAt      DateTime @default(now()) @map("created_at") @db.DateTime2
-  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime2
-  deletedAt DateTime? @map("deleted_at") @db.DateTime2
-
-
-  user           User     @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+  permId         String    @id(map: "pk_module_permissions") @default(dbgenerated("newid()"), map: "DF__module_pe__perm___5070F446") @map("perm_id") @db.UniqueIdentifier
+  userId         String    @map("user_id") @db.UniqueIdentifier
+  moduleCode     String    @map("module_code") @db.VarChar(50)
+  canDownloadPii Boolean   @default(false, map: "DF__module_pe__can_d__5165187F") @map("can_download_pii")
+  createdAt      DateTime  @default(dbgenerated("sysdatetime()"), map: "DF__module_pe__creat__52593CB8") @map("created_at")
+  updatedAt      DateTime  @default(dbgenerated("sysdatetime()"), map: "DF__module_pe__updat__534D60F1") @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+  user           User      @relation(fields: [userId], references: [userId], onUpdate: NoAction, map: "fk_module_permissions_users")
 
   @@map("module_permissions")
   @@schema("identity_access")
+}
+
+model audit_download_logs {
+  log_id        String   @id(map: "pk_audit_download_logs") @default(dbgenerated("newid()"), map: "DF__audit_dow__log_i__5BE2A6F2") @db.UniqueIdentifier
+  user_id       String   @db.UniqueIdentifier
+  contract_num  String   @db.VarChar(20)
+  download_date DateTime @default(dbgenerated("sysdatetime()"), map: "DF__audit_dow__downl__5CD6CB2B")
+  is_flagged    Boolean  @default(false, map: "DF__audit_dow__is_fl__5DCAEF64")
+  users         User     @relation(fields: [user_id], references: [userId], onUpdate: NoAction, map: "fk_audit_download_logs_users")
+
+  @@schema("digital_records")
+}
+
+model record_requests {
+  request_id      String   @id(map: "pk_expediente_requests") @default(dbgenerated("newid()"), map: "DF__record_re__reque__571DF1D5") @db.UniqueIdentifier
+  requested_by    String   @db.UniqueIdentifier
+  req_date        DateTime @default(dbgenerated("sysdatetime()"), map: "DF__record_re__req_d__5812160E")
+  status          String   @db.VarChar(20)
+  total_contracts Int
+  zip_s3_url      String?  @db.VarChar(255)
+  users           User     @relation(fields: [requested_by], references: [userId], onUpdate: NoAction, map: "fk_expediente_requests_users")
+
+  @@schema("digital_records")
+}
+
+model territory_logs {
+  log_id       String   @id(map: "pk_territory_logs") @default(dbgenerated("newid()"), map: "DF__territory__log_i__619B8048") @db.UniqueIdentifier
+  filename     String   @db.VarChar(100)
+  upload_date  DateTime @default(dbgenerated("sysdatetime()"), map: "DF__territory__uploa__628FA481")
+  uploaded_by  String   @db.UniqueIdentifier
+  status_code  Int
+  response_msg String?  @db.NVarChar(Max)
+  users        User     @relation(fields: [uploaded_by], references: [userId], onUpdate: NoAction, map: "fk_territory_logs_users")
+
+  @@schema("customer_support")
 }

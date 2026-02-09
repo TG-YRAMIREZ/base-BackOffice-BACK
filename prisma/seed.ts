@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Iniciando Seed de Gobernanza (HU BO-4)...');
+  console.log('Iniciando Seed de Gobernanza (HU BO-4)...');
 
   // 1. Crear o actualizar el usuario administrador
   const adminUser = await prisma.user.upsert({
@@ -52,12 +52,12 @@ async function main() {
     }))
   });
 
-  console.log('🚀 Seed finalizado con éxito.');
+  console.log(' Seed finalizado con éxito.');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Error en el Seed:', e);
+    console.error(' Error en el Seed:', e);
     process.exit(1);
   })
   .finally(async () => {

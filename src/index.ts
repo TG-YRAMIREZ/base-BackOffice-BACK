@@ -39,8 +39,8 @@ const start = async () => {
     const port = 3000;
     await app.listen({ port, host: '0.0.0.0' });
     
-    console.log(`🚀 Servidor listo en: http://localhost:${port}`);
-    console.log(`📄 Documentación Swagger: http://localhost:${port}/docs`);
+    console.log(`Servidor listo en: http://localhost:${port}`);
+    console.log(`Documentación Swagger: http://localhost:${port}/docs`);
     
   } catch (err) {
     app.log.error(err);

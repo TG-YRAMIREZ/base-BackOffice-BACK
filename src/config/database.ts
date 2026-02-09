@@ -1,11 +1,16 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaMssql } from '@prisma/adapter-mssql';
+import dotenv from 'dotenv';
+import path from 'path';
 
-// Limpieza de caracteres invisibles o comillas de Windows
+// Cargar variables de entorno explícitamente
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
+// Ahora process.env.DATABASE_URL ya tendrá valor
 const connectionString = (process.env.DATABASE_URL || '').replace(/["']/g, '').trim();
 
 if (!connectionString) {
-  throw new Error("❌ DATABASE_URL no definida");
+  throw new Error("❌ DATABASE_URL no definida en process.env");
 }
 
 const adapter = new PrismaMssql(connectionString);
