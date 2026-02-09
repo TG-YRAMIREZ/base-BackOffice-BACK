@@ -1,5 +1,22 @@
-Esta estructura cumple al 100% con los Microservices Guidelines y prepara tu proyecto para producción y pruebas escalables.
-BACK
+Arquetipo backoffice
+📌 Objetivo
+
+- Este documento define la estructura oficial del proyecto Backend, alineada con los lineamientos corporativos, buenas prácticas de desarrollo y las Microservices Guidelines de la empresa.
+
+- La finalidad de este arquetipo es:
+
+    Garantizar consistencia entre proyectos
+
+    Facilitar escalabilidad y mantenibilidad
+
+    Asegurar observabilidad, testeo y despliegue en producción
+
+    Servir como referencia obligatoria para nuevos desarrollos
+
+
+🗂️ Estructura Ideal del Proyecto
+
+La siguiente estructura cumple al 100% con los estándares de microservicios y está preparada para entornos productivos y pruebas escalables.
 
 
 ├── docker-compose.yml
@@ -12,7 +29,6 @@ BACK
 │   ├── migrations/
 │   └── seed.ts
 ├── scripts/
-│   └── init-aws.sh
 ├── src/
 │   ├── app.ts                    # Configuración de Plugins globales
 │   ├── index.ts                  # Entry point (Bootstrap)

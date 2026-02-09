@@ -6,7 +6,6 @@ import path from 'path';
 // Cargar variables de entorno explícitamente
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-// Ahora process.env.DATABASE_URL ya tendrá valor
 const connectionString = (process.env.DATABASE_URL || '').replace(/["']/g, '').trim();
 
 if (!connectionString) {
@@ -32,9 +31,9 @@ export async function validateSeedData() {
       include: { permissions: true }
     });
     
-    console.log(`📊 Usuarios en BD: ${userCount}`);
-    console.log(`🔑 Admin encontrado: ${admin ? 'SÍ' : 'NO'}`);
-    console.log(`📜 Permisos cargados: ${admin?.permissions.length || 0}`);
+    console.log(`Usuarios en BD: ${userCount}`);
+    console.log(`Admin encontrado: ${admin ? 'SÍ' : 'NO'}`);
+    console.log(`Permisos cargados: ${admin?.permissions.length || 0}`);
   } catch (error) {
     console.error('❌ Error al validar datos:', error);
   }
